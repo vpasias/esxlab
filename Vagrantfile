@@ -61,7 +61,7 @@ Vagrant.configure(2) do |config|
 
     config.vm.define "node0" do |mgt|
       # mgt.vm.box = "jaredeh/ubuntu2204-server"
-      mgt.vm.box = "d3atiq/ubuntu-18.04-rdp-server-base"
+      mgt.vm.box = "smogork/archlinux-rdp"
       mgt.vm.network "private_network", ip: "192.168.100.20"
       mgt.vm.hostname = "node0.esxi.lab"
       mgt.vm.provider 'libvirt' do |lvn|
