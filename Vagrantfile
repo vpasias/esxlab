@@ -56,16 +56,14 @@ Vagrant.configure(2) do |config|
   end
  end 
 
-    config.vm.define "node0" do |node|
-      node.vm.box = "tangofoxtrot/ubuntu-rdp"
-      node.vm.network "private_network", ip: "192.168.100.20"
-      node.vm.hostname = "node0.esxi.lab"
-
-    config.vm.provider 'libvirt' do |lvn|
-      lvn.memory = 6*1024
-      lvn.cpus = 2
-    end
-  
+    config.vm.define "node0" do |mgt|
+      mgt.vm.box = "tangofoxtrot/ubuntu-rdp"
+      mgt.vm.network "private_network", ip: "192.168.100.20"
+      mgt.vm.hostname = "node0.esxi.lab"
+      mgt.vm.provider 'libvirt' do |lvn|
+        lvn.memory = 6*1024
+        lvn.cpus = 2
+      end  
     end
 
 end
