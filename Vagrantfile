@@ -61,6 +61,7 @@ Vagrant.configure(2) do |config|
 
     config.vm.define "node0" do |mgt|
       mgt.vm.box = "peru/windows-10-enterprise-x64-eval"
+      # mgt.vm.box = "peru/windows-server-2022-standard-x64-eval"
       mgt.vm.network "private_network", ip: "192.168.100.20"
       mgt.vm.hostname = "node0.esxi.lab"
       mgt.vm.provider 'libvirt' do |lvn|
