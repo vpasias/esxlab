@@ -1,7 +1,11 @@
-ESXI_DOMAIN = 'esxi.test'
+ESXI_DOMAIN = 'esxi.lab'
 MANAGEMENT_CERTIFICATE_PATH = "shared/tls/example-esxi-ca/#{ESXI_DOMAIN}"
 DATASTORE_DISK_SIZE_GB = 80
 HOSTS = 3
+
+system("virsh net-update mgt add ip-dhcp-host \"<host mac='52:54:00:fb:95:91' ip='192.168.255.101' />\" --live --config")
+system("virsh net-update mgt add ip-dhcp-host \"<host mac='52:54:00:fb:95:92' ip='192.168.255.102' />\" --live --config")
+system("virsh net-update mgt add ip-dhcp-host \"<host mac='52:54:00:fb:95:93' ip='192.168.255.103' />\" --live --config")
 
 # enable typed triggers.
 # NB this is needed to modify the libvirt domain scsi controller model to virtio-scsi.
@@ -20,12 +24,17 @@ ensure_management_certificate
 
 Vagrant.configure(2) do |config|
   (1..HOSTS).each do |i|
-    config.vm.define "node-#{i}" do |node|
+    config.vm.define "node#{i}" do |node|
       node.vm.box = 'esxi-7.0.3-amd64'
       #node.vm.box = 'esxi-7.0.3-uefi-amd64'
-      node.vm.hostname = node-#{i}.ESXI_DOMAIN
+      node.vm.network "private_network", ip: "192.168.100.2{i}"
+      # node.vm.network "private_network", ip: "192.168.200.2{i}"
+      node.vm.hostname = node#{i}.ESXI_DOMAIN
 
     config.vm.provider 'libvirt' do |lv|
+      lv.management_network_name = "mgt"
+      lv.management_network_address = "192.168.255.0/24"
+      lv.management_network_mac = "52:54:00:fb:95:9#{i}"
       lv.memory = 64*1024
       lv.cpus = 12
       lv.storage :file, :bus => 'ide', :cache => 'unsafe', :size => "#{DATASTORE_DISK_SIZE_GB}G"
