@@ -9,7 +9,7 @@ ENV['VAGRANT_EXPERIMENTAL'] = 'typed_triggers'
 
 require 'open3'
 
-Vagrant.configure(2) do |config|
+Vagrant.configure(2) do |config, nconfig|
   
   (1..HOSTS).each do |i|
     config.vm.define "node#{i}" do |node|
@@ -56,7 +56,7 @@ Vagrant.configure(2) do |config|
   end
  end 
 
-    config.vm.define "node0" do |mgt|
+    nconfig.vm.define "node0" do |mgt|
       mgt.vm.box = "debian/bullseye64"
       mgt.vm.network "private_network", ip: "192.168.100.20"
       mgt.vm.hostname = "node0.esxi.lab"
