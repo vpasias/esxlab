@@ -60,7 +60,7 @@ Vagrant.configure(2) do |config|
  end 
 
     config.vm.define "node0" do |mgt|
-      mgt.vm.box = "debian/bullseye64"
+      mgt.vm.box = "generic/debian11"
       mgt.vm.network "private_network", ip: "192.168.100.20"
       mgt.vm.hostname = "node0.esxi.lab"
       mgt.vm.provider 'libvirt' do |lvn|
