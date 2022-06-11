@@ -63,6 +63,7 @@ Vagrant.configure(2) do |config|
       mgt.vm.box = "debian/bullseye64"
       mgt.vm.network "private_network", ip: "192.168.100.20"
       mgt.vm.hostname = "node0.esxi.lab"
+      mgt.vm.synced_folder ".", "/vagrant", type: "rsync"
       mgt.vm.provider 'libvirt' do |lvn|
         lvn.memory = 6*1024
         lvn.cpus = 2
