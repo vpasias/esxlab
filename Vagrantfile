@@ -43,8 +43,8 @@ Vagrant.configure(2) do |config|
     config.vm.provision :shell, privileged: false, inline: 'esxcli system settings advanced set -o /UserVars/HostClientCEIPOptIn -i 2'
 
     # configure the management certificate.
-    config.vm.provision :file, source: MANAGEMENT_CERTIFICATE_PATH, destination: '/tmp/tls'
-    config.vm.provision :shell, privileged: false, path: 'provision-management-certificate.sh'
+    #config.vm.provision :file, source: MANAGEMENT_CERTIFICATE_PATH, destination: '/tmp/tls'
+    #config.vm.provision :shell, privileged: false, path: 'provision-management-certificate.sh'
     
     # create the datastore1 datastore in the second disk.
     config.vm.provision :shell, privileged: false, path: 'provision-datastore.sh'
