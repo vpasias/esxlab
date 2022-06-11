@@ -47,7 +47,7 @@ Vagrant.configure(2) do |config|
     #config.vm.provision :shell, privileged: false, path: 'provision-management-certificate.sh'
     
     # create the datastore1 datastore in the second disk.
-    config.vm.provision :shell, privileged: false, path: 'provision-datastore.sh'
+    #config.vm.provision :shell, privileged: false, path: 'provision-datastore.sh'
 
     # show the installation summary.
     config.vm.provision :shell, privileged: false, path: 'summary.sh'
