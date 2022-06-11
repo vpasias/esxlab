@@ -60,7 +60,8 @@ Vagrant.configure(2) do |config|
  end 
 
     config.vm.define "node0" do |mgt|
-      mgt.vm.box = "jaredeh/ubuntu2204-server"
+      # mgt.vm.box = "jaredeh/ubuntu2204-server"
+      mgt.vm.box = "d3atiq/ubuntu-18.04-rdp-server-base"
       mgt.vm.network "private_network", ip: "192.168.100.20"
       # mgt.vm.network "forwarded_port", guest: 3389, host: 3389
       mgt.vm.hostname = "node0.esxi.lab"
