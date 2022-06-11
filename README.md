@@ -1,2 +1,2 @@
-# esxlab
+# ESX Lab
 ESX Lab
