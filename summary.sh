@@ -11,13 +11,6 @@ cat <<EOF
 To access this system add this host managament IP address to your hosts file:
 
     sudo bash -c "hosts=\"\$(grep -vE '\\s+$fqdn' /etc/hosts)\"; (echo \"\\\$hosts\"; echo '$management_ip_address $fqdn') >/etc/hosts"
-
-Trust the example CA:
-    sudo install shared/tls/example-esxi-ca/example-esxi-ca-crt.pem /usr/local/share/ca-certificates/example-esxi-ca.crt
-    sudo update-ca-certificates -v
-    certutil -d sql:\$HOME/.pki/nssdb -A -t 'C,,' -n 'Example ESXi CA' -i shared/tls/example-esxi-ca/example-esxi-ca-crt.pem
-    certutil -d sql:\$HOME/.pki/nssdb -L
-    #certutil -d sql:\$HOME/.pki/nssdb -D -n 'Example ESXi CA' # delete.
     
 Access the management web interface at:
     https://$fqdn
