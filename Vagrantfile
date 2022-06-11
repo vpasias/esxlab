@@ -1,5 +1,5 @@
 ESXI_DOMAIN = 'esxi.lab'
-MANAGEMENT_CERTIFICATE_PATH = "shared/tls/example-esxi-ca/#{ESXI_DOMAIN}"
+#MANAGEMENT_CERTIFICATE_PATH = "shared/tls/example-esxi-ca/#{ESXI_DOMAIN}"
 DATASTORE_DISK_SIZE_GB = 80
 HOSTS = 3
 
@@ -28,10 +28,10 @@ Vagrant.configure(2) do |config|
     
     # create the management certificate that will be used to access the esxi
     # management web interface (hostd).
-    def ensure_management_certificate
-      return if File.exists? MANAGEMENT_CERTIFICATE_PATH
-      system("bash provision-certificate.sh #{ESXI_DOMAIN}")
-    end
+    #def ensure_management_certificate
+    #  return if File.exists? MANAGEMENT_CERTIFICATE_PATH
+    #  system("bash provision-certificate.sh #{ESXI_DOMAIN}")
+    #end
 
     ensure_management_certificate
 
