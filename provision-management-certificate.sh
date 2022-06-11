@@ -20,4 +20,4 @@ chown root:root /etc/vmware/ssl/rui.key
 sleep 10
 
 # delete the temporary files.
-#rm -rf /tmp/tls
+rm -rf /tmp/tls
