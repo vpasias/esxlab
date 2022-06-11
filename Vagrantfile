@@ -25,7 +25,7 @@ Vagrant.configure(2) do |config|
       #node.vm.box = 'esxi-7.0.3-uefi-amd64'
       node.vm.network "private_network", ip: "192.168.100.2{i}"
       # node.vm.network "private_network", ip: "192.168.200.2{i}"
-      node.vm.hostname = "node#{i}"."#{ESXI_DOMAIN}"
+      node.vm.hostname = "node#{i}".esxi.lab
 
     config.vm.provider 'libvirt' do |lv|
       lv.management_network_name = "management"
