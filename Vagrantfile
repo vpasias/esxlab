@@ -22,13 +22,13 @@ Vagrant.configure(2) do |config|
       node.vm.network "private_network", ip: "192.168.200.2#{i}"
       node.vm.hostname = "node#{i}.esxi.lab"
 
-    config.vm.provider 'libvirt' do |lv, config|
-      #lv.management_network_name = "management"
-      #lv.management_network_mac = "52:54:00:8a:8b:c#{i}"
-      lv.memory = 64*1024
-      lv.cpus = 12
-      lv.storage :file, :bus => 'ide', :cache => 'unsafe', :size => "#{DATASTORE_DISK_SIZE_GB}G"
-    end
+      node.vm.provider 'libvirt' do |lv|
+        #lv.management_network_name = "management"
+        #lv.management_network_mac = "52:54:00:8a:8b:c#{i}"
+        lv.memory = 64*1024
+        lv.cpus = 12
+        lv.storage :file, :bus => 'ide', :cache => 'unsafe', :size => "#{DATASTORE_DISK_SIZE_GB}G"
+      end
     
     # create the management certificate that will be used to access the esxi
     # management web interface (hostd).
@@ -44,17 +44,17 @@ Vagrant.configure(2) do |config|
     #    executing commands as root.
 
     # do not Join the VMware Customer Experience Improvement Program.
-    config.vm.provision :shell, privileged: false, inline: 'esxcli system settings advanced set -o /UserVars/HostClientCEIPOptIn -i 2'
+    node.vm.provision :shell, privileged: false, inline: 'esxcli system settings advanced set -o /UserVars/HostClientCEIPOptIn -i 2'
 
     # configure the management certificate.
-    #config.vm.provision :file, source: MANAGEMENT_CERTIFICATE_PATH, destination: '/tmp/tls'
-    #config.vm.provision :shell, privileged: false, path: 'provision-management-certificate.sh'
+    #node.vm.provision :file, source: MANAGEMENT_CERTIFICATE_PATH, destination: '/tmp/tls'
+    #node.vm.provision :shell, privileged: false, path: 'provision-management-certificate.sh'
     
     # create the datastore1 datastore in the second disk.
-    #config.vm.provision :shell, privileged: false, path: 'provision-datastore.sh'
+    #node.vm.provision :shell, privileged: false, path: 'provision-datastore.sh'
 
     # show the installation summary.
-    config.vm.provision :shell, privileged: false, path: 'summary.sh'
+    node.vm.provision :shell, privileged: false, path: 'summary.sh'
     
   end
  end 
