@@ -9,15 +9,6 @@ ENV['VAGRANT_EXPERIMENTAL'] = 'typed_triggers'
 
 require 'open3'
 
-# create the management certificate that will be used to access the esxi
-# management web interface (hostd).
-def ensure_management_certificate
-  return if File.exists? MANAGEMENT_CERTIFICATE_PATH
-  system("bash provision-certificate.sh #{ESXI_DOMAIN}")
-end
-
-ensure_management_certificate
-
 Vagrant.configure(2) do |config|
   (1..HOSTS).each do |i|
     config.vm.define "node#{i}" do |node|
@@ -34,6 +25,15 @@ Vagrant.configure(2) do |config|
       lv.cpus = 12
       lv.storage :file, :bus => 'ide', :cache => 'unsafe', :size => "#{DATASTORE_DISK_SIZE_GB}G"
     end
+    
+    # create the management certificate that will be used to access the esxi
+    # management web interface (hostd).
+    def ensure_management_certificate
+      return if File.exists? MANAGEMENT_CERTIFICATE_PATH
+      system("bash provision-certificate.sh #{ESXI_DOMAIN}")
+    end
+
+    ensure_management_certificate
 
     # NB you must use `privileged: false` in the provisioning steps because esxi
     #    does not have the `sudo` command, and, by default, you are already
