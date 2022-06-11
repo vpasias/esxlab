@@ -65,8 +65,8 @@ Vagrant.configure(2) do |config|
       # mgt.vm.network "forwarded_port", guest: 3389, host: 3389
       mgt.vm.hostname = "node0.esxi.lab"
       mgt.vm.provider 'libvirt' do |lvn|
-        lvn.memory = 6*1024
-        lvn.cpus = 2
+        lvn.memory = 8*1024
+        lvn.cpus = 4
       end  
     end
 
