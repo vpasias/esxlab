@@ -9,7 +9,7 @@ ENV['VAGRANT_EXPERIMENTAL'] = 'typed_triggers'
 
 require 'open3'
 
-Vagrant.configure(2) do |config, nconfig|
+Vagrant.configure(2) do |config|
   
   (1..HOSTS).each do |i|
     config.vm.define "node#{i}" do |node|
