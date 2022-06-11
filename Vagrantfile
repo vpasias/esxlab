@@ -1,3 +1,6 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
 ESXI_DOMAIN = 'esxi.lab'
 #MANAGEMENT_CERTIFICATE_PATH = "shared/tls/example-esxi-ca/#{ESXI_DOMAIN}"
 DATASTORE_DISK_SIZE_GB = 80
@@ -56,7 +59,7 @@ Vagrant.configure(2) do |config|
   end
  end 
 
-    nconfig.vm.define "node0" do |mgt|
+    config.vm.define "node0" do |mgt|
       mgt.vm.box = "debian/bullseye64"
       mgt.vm.network "private_network", ip: "192.168.100.20"
       mgt.vm.hostname = "node0.esxi.lab"
