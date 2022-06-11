@@ -29,7 +29,6 @@ Vagrant.configure(2) do |config|
 
     config.vm.provider 'libvirt' do |lv|
       lv.management_network_name = "management"
-      lv.management_network_address = "192.168.255.0/24"
       lv.management_network_mac = "52:54:00:8a:8b:c#{i}"
       lv.memory = 64*1024
       lv.cpus = 12
