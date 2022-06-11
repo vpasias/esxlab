@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 
-cat > /home/iason/temp/management.xml <<EOF
+cat > /home/iason/tmp/management.xml <<EOF
 <network>
   <name>management</name>
   <forward mode='nat'/>
@@ -25,6 +25,6 @@ cat > /home/iason/temp/management.xml <<EOF
 </network>
 EOF
 
-virsh net-define /mnt/extra/management.xml && virsh net-autostart management && virsh net-start management
+virsh net-define /home/iason/tmp/management.xml && virsh net-autostart management && virsh net-start management
 
 ip a && sudo virsh net-list --all
