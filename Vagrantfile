@@ -60,8 +60,7 @@ Vagrant.configure(2) do |config|
  end 
 
     config.vm.define "node0" do |mgt|
-      # mgt.vm.box = "jaredeh/ubuntu2204-server"
-      mgt.vm.box = "smogork/archlinux-rdp"
+      mgt.vm.box = "peru/windows-10-enterprise-x64-eval"
       mgt.vm.network "private_network", ip: "192.168.100.20"
       mgt.vm.hostname = "node0.esxi.lab"
       mgt.vm.provider 'libvirt' do |lvn|
