@@ -28,7 +28,3 @@ EOF
 virsh net-define /mnt/extra/management.xml && virsh net-autostart management && virsh net-start management
 
 ip a && sudo virsh net-list --all
-
-sleep 20
-
-vagrant up
