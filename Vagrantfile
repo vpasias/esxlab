@@ -23,13 +23,13 @@ Vagrant.configure(2) do |config|
     config.vm.define "node#{i}" do |node|
       node.vm.box = 'esxi-7.0.3-amd64'
       # node.vm.box = 'esxi-7.0.3-uefi-amd64'
-      # node.vm.network "private_network", ip: "192.168.100.2#{i}"
+      node.vm.network "private_network", ip: "192.168.100.2#{i}"
       # node.vm.network "private_network", ip: "192.168.200.2{i}"
       node.vm.hostname = "node#{i}.esxi.lab"
 
     config.vm.provider 'libvirt' do |lv|
-      lv.management_network_name = "management"
-      lv.management_network_mac = "52:54:00:8a:8b:c#{i}"
+      #lv.management_network_name = "management"
+      #lv.management_network_mac = "52:54:00:8a:8b:c#{i}"
       lv.memory = 64*1024
       lv.cpus = 12
       lv.storage :file, :bus => 'ide', :cache => 'unsafe', :size => "#{DATASTORE_DISK_SIZE_GB}G"
