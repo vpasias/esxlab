@@ -33,7 +33,7 @@ Vagrant.configure(2) do |config|
     #  system("bash provision-certificate.sh #{ESXI_DOMAIN}")
     #end
 
-    ensure_management_certificate
+    #ensure_management_certificate
 
     # NB you must use `privileged: false` in the provisioning steps because esxi
     #    does not have the `sudo` command, and, by default, you are already
