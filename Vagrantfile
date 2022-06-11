@@ -27,7 +27,7 @@ Vagrant.configure(2) do |config|
       # node.vm.network "private_network", ip: "192.168.200.2{i}"
       node.vm.hostname = "node#{i}.esxi.lab"
 
-    config.vm.provider 'libvirt' do |lv|
+    config.vm.provider 'libvirt' do |lv, config|
       #lv.management_network_name = "management"
       #lv.management_network_mac = "52:54:00:8a:8b:c#{i}"
       lv.memory = 64*1024
