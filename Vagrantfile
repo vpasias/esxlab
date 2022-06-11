@@ -10,6 +10,19 @@ ENV['VAGRANT_EXPERIMENTAL'] = 'typed_triggers'
 require 'open3'
 
 Vagrant.configure(2) do |config|
+  
+    config.vm.define "node0" do |node|
+      node.vm.box = "tangofoxtrot/ubuntu-rdp"
+      node.vm.network "private_network", ip: "192.168.100.20"
+      node.vm.hostname = "node0.esxi.lab"
+
+    config.vm.provider 'libvirt' do |lv|
+      lv.memory = 6*1024
+      lv.cpus = 2
+    end
+  
+    end
+  
   (1..HOSTS).each do |i|
     config.vm.define "node#{i}" do |node|
       node.vm.box = 'esxi-7.0.3-amd64'
