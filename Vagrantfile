@@ -66,9 +66,7 @@ Vagrant.configure(2) do |config|
       # mgt.vm.box = "peru/windows-server-2022-standard-x64-eval"
       mgt.vm.network "private_network", ip: "192.168.100.20"
       mgt.vm.hostname = "node0"
-      mgt.vm.provider 'libvirt' do |lvn|
-        lvn.cpu_mode = 'host-passthrough'
-        lvn.nested = true        
+      mgt.vm.provider 'libvirt' do |lvn|    
         lvn.memory = 8*1024
         lvn.cpus = 4
       end  
