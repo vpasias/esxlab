@@ -3,7 +3,7 @@
 
 ESXI_DOMAIN = 'esxi.lab'
 #MANAGEMENT_CERTIFICATE_PATH = "shared/tls/example-esxi-ca/#{ESXI_DOMAIN}"
-DATASTORE_DISK_SIZE_GB = 80
+DATASTORE_DISK_SIZE_GB = 900
 HOSTS = 3
 
 # enable typed triggers.
@@ -23,8 +23,8 @@ Vagrant.configure(2) do |config|
       node.vm.hostname = "node#{i}.esxi.lab"
 
       node.vm.provider 'libvirt' do |lv|
-        #lv.management_network_name = "management"
-        #lv.management_network_mac = "52:54:00:8a:8b:c#{i}"
+        lv.management_network_name = "vagrant-libvirt"
+        lv.management_network_mac = "08:4F:A9:00:00:0#{i}"
         lv.memory = 32*1024
         lv.cpus = 8
         lv.storage :file, :bus => 'ide', :cache => 'unsafe', :size => "#{DATASTORE_DISK_SIZE_GB}G"
