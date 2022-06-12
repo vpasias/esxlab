@@ -25,8 +25,8 @@ Vagrant.configure(2) do |config|
       node.vm.provider 'libvirt' do |lv|
         #lv.management_network_name = "management"
         #lv.management_network_mac = "52:54:00:8a:8b:c#{i}"
-        lv.memory = 64*1024
-        lv.cpus = 12
+        lv.memory = 32*1024
+        lv.cpus = 8
         lv.storage :file, :bus => 'ide', :cache => 'unsafe', :size => "#{DATASTORE_DISK_SIZE_GB}G"
       end
     
