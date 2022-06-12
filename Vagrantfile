@@ -25,6 +25,8 @@ Vagrant.configure(2) do |config|
       node.vm.provider 'libvirt' do |lv|
         lv.management_network_name = "vagrant-libvirt"
         lv.management_network_mac = "08:4F:A9:00:00:0#{i}"
+        lv.cpu_mode = 'host-passthrough'
+        lv.nested = true
         lv.memory = 32*1024
         lv.cpus = 8
         lv.storage :file, :bus => 'ide', :cache => 'unsafe', :size => "#{DATASTORE_DISK_SIZE_GB}G"
@@ -65,6 +67,8 @@ Vagrant.configure(2) do |config|
       mgt.vm.network "private_network", ip: "192.168.100.20"
       mgt.vm.hostname = "node0"
       mgt.vm.provider 'libvirt' do |lvn|
+        lvn.cpu_mode = 'host-passthrough'
+        lvn.nested = true        
         lvn.memory = 8*1024
         lvn.cpus = 4
       end  
