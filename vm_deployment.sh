@@ -44,7 +44,7 @@ cat << EOF | tee /mnt/extra/management.xml
       <host mac='08:4F:A9:00:00:0D' name='node13' ip='192.168.255.113'/>
       <host mac='08:4F:A9:00:00:0E' name='node14' ip='192.168.255.114'/>
       <host mac='08:4F:A9:00:00:0F' name='node15' ip='192.168.255.115'/>
-      <host mac='52:54:00:8a:8b:c1' name='node0' ip='192.168.255.100'/>
+      <host mac='08:4F:A9:00:00:11' name='node0' ip='192.168.255.100'/>
     </dhcp>
   </ip>
 </network>
@@ -52,7 +52,7 @@ EOF
 
 virsh net-define /mnt/extra/management.xml && virsh net-autostart management && virsh net-start management && virsh net-list --all
 
-./kvm-install-vm create -c 4 -m 16384 -d 100 -t ubuntu2004 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c1 node0
+./kvm-install-vm create -c 4 -m 16384 -d 100 -t ubuntu2004 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 08:4F:A9:00:00:11 node0
 
 virsh list --all && brctl show && virsh net-list --all
 
