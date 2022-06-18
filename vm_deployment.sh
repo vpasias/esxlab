@@ -76,11 +76,6 @@ ssh -o "StrictHostKeyChecking=no" ubuntu@node0 "cat << EOF | sudo tee /etc/sysct
 net.ipv4.ip_forward=1
 net.ipv4.conf.all.forwarding=1
 net.ipv6.conf.all.forwarding=1
-net.mpls.conf.lo.input=1
-net.mpls.conf.ens3.input=1
-net.mpls.platform_labels=100000
-net.ipv4.tcp_l3mdev_accept=1
-net.ipv4.udp_l3mdev_accept=1
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@node0 "cat << EOF | sudo tee /etc/sysctl.d/60-lxd-production.conf
