@@ -3,7 +3,7 @@
 
 cat << EOF | tee /mnt/extra/management.xml
 <network>
-  <name>mgt</name>
+  <name>management</name>
   <uuid>7ed704dd-3901-452c-91d0-58ad75901b2d</uuid>
   <forward mode='nat'>
     <nat>
