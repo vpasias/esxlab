@@ -50,7 +50,25 @@ cat << EOF | tee /mnt/extra/management.xml
 </network>
 EOF
 
+cat > /mnt/extra/cluster.xml <<EOF
+<network>
+  <name>cluster</name>
+  <bridge name="virbr101" stp='off' macTableManager="kernel"/>
+  <mtu size="9216"/> 
+</network>
+EOF
+
+cat > /mnt/extra/service.xml <<EOF
+<network>
+  <name>service</name>
+  <bridge name="virbr102" stp='off' macTableManager="kernel"/>
+  <mtu size="9216"/> 
+</network>
+EOF
+
 virsh net-define /mnt/extra/management.xml && virsh net-autostart management && virsh net-start management && virsh net-list --all
+virsh net-define /mnt/extra/cluster.xml && virsh net-autostart cluster && virsh net-start cluster
+virsh net-define /mnt/extra/service.xml && virsh net-autostart service && virsh net-start service
 
 ./kvm-install-vm create -c 4 -m 16384 -d 100 -t ubuntu2004 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 08:4F:A9:00:00:11 node0
 
