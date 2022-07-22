@@ -23,7 +23,7 @@ ip a && sudo virsh net-list --all
 sleep 20
 
 #  AIO
-./kvm-install-vm create -c 48 -m 196608 -t centos8 -d 1200 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr101 -T US/Eastern -M 52:54:00:8a:8b:c1 node0
+./kvm-install-vm create -c 52 -m 262144 -t centos8 -d 1200 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr101 -T US/Eastern -M 52:54:00:8a:8b:c1 node0
 
 sleep 60
 
