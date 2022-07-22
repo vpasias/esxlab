@@ -43,6 +43,6 @@ EOF"
 
 ssh -o "StrictHostKeyChecking=no" centos@node0 "sudo modprobe -r kvm_intel && sudo modprobe -a kvm_intel"
 
-ssh -o "StrictHostKeyChecking=no" centos@node0 "sudo dnf -y update && sudo dnf install -y git ansible"
+ssh -o "StrictHostKeyChecking=no" centos@node0 "sudo dnf -y update && sudo dnf install -y git epel-release && sudo dnf install -y ansible"
 
 ssh -o "StrictHostKeyChecking=no" centos@node0 "sudo reboot"
