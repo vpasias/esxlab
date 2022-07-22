@@ -43,6 +43,9 @@ EOF"
 
 ssh -o "StrictHostKeyChecking=no" centos@node0 "sudo modprobe -r kvm_intel && sudo modprobe -a kvm_intel"
 
-ssh -o "StrictHostKeyChecking=no" centos@node0 "sudo dnf -y update && sudo dnf install -y git epel-release && sudo dnf -y update && sudo dnf install -y ansible"
+ssh -o "StrictHostKeyChecking=no" centos@node0 "sudo dnf -y update && sudo dnf install -y git" 
+ssh -o "StrictHostKeyChecking=no" centos@node0 "sudo dnf -y install centos-release-ansible-29"
+ssh -o "StrictHostKeyChecking=no" centos@node0 'sudo sed -i -e "s/enabled=1/enabled=0/g" /etc/yum.repos.d/CentOS-SIG-ansible-29.repo'
+ssh -o "StrictHostKeyChecking=no" centos@node0 "sudo dnf --enablerepo=centos-ansible-29 -y install ansible"
 
 ssh -o "StrictHostKeyChecking=no" centos@node0 "sudo reboot"
