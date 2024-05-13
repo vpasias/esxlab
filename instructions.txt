@@ -1,0 +1,268 @@
+chmod +x cloudlab-setup-ubuntu-tl.sh && ./cloudlab-setup-ubuntu-tl.sh && \
+sudo apt-get install libvirt-daemon genisoimage libguestfs-tools libosinfo-bin virtinst qemu-kvm git vim net-tools wget curl bash-completion python-pip libvirt-daemon-system virt-manager bridge-utils libnss-libvirt libvirt-clients osinfo-db-tools intltool sshpass p7zip-full p7zip-rar -y && \
+sudo sed -i 's/hosts:          files dns/hosts:          files libvirt libvirt_guest dns/' /etc/nsswitch.conf && sudo lsmod | grep kvm && sudo reboot
+#sudo systemctl restart libvirtd && sudo systemctl status libvirtd
+
+screen
+# Press Return to continue
+# detach from session without killing it: Ctrl a d 
+# to see screen sessions: screen -ls
+# detach from closed session: screen -d -r 1981.pts-0.node0
+# enter session: screen -r 1981.pts-0.node0
+# exit a session and terminate it: exit
+
+sudo -i
+
+# Create OS node VMs
+sudo apt update -y && sudo apt install cockpit -y && sudo systemctl enable --now cockpit.socket && sudo apt install cockpit-machines -y && echo "root:gprm8350" | sudo chpasswd && \
+cd /mnt/extra && cat /sys/module/kvm_intel/parameters/nested && cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l && free -h && df -hT && sudo virsh list --all && sudo brctl show && \
+mkdir -p /mnt/extra/virt/images && mkdir -p /mnt/extra/virt/vms && cd /mnt/extra/virt/images && \
+cd /usr/lib/ipxe/qemu/ && wget https://github.com/qemu/qemu/raw/master/pc-bios/efi-e1000e.rom && cd /mnt/extra && \
+wget -O "/mnt/extra/osinfo-db.tar.xz" https://releases.pagure.org/libosinfo/osinfo-db-20231215.tar.xz && sudo osinfo-db-import --local "/mnt/extra/osinfo-db.tar.xz" && \
+sudo sed -i -E 's,#?(security_driver)\s*=.*,\1 = "none",g' /etc/libvirt/qemu.conf && sudo systemctl restart libvirtd && \
+cd /mnt/extra/virt/images/ && wget https://mirror.mahanserver.net/VMware/VMvisor/VMware-VMvisor-Installer-7.0U3d-19482537.x86_64.iso && \
+wget http://mirrors.edge.kernel.org/ubuntu-releases/22.04.4/ubuntu-22.04.4-live-server-amd64.iso && \
+iso=/mnt/extra/virt/images/VMware-VMvisor-Installer-7.0U3d-19482537.x86_64.iso && cd /mnt/extra && \
+sudo tee --append /etc/hosts <<< "172.16.1.101 n1.example.com n1" && \
+sudo tee --append /etc/hosts <<< "172.16.1.102 n2.example.com n2" && \
+sudo tee --append /etc/hosts <<< "172.16.1.103 n3.example.com n3" && \
+sudo tee --append /etc/hosts <<< "172.16.1.104 n4.example.com n4" && \
+sudo tee --append /etc/hosts <<< "172.16.1.105 n5.example.com n5" && \
+sudo tee --append /etc/hosts <<< "172.16.1.106 n6.example.com n6" && \
+sudo tee --append /etc/hosts <<< "172.16.1.107 n7.example.com n7"
+
+# Access cockpit: http://130.127.134.14:9090
+
+cat << EOF | tee /mnt/extra/management.xml
+<network>
+  <name>management</name>
+  <uuid>7ed704dd-3901-452c-91d0-58ad75901b2d</uuid>
+  <forward mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <bridge name='virbr100' stp='on' delay='0'/>
+  <mac address='52:54:00:d8:3f:1d'/>
+  <ip address='172.16.1.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='172.16.1.200' end='172.16.1.250'/>
+      <host mac='08:4F:A9:00:00:01' name='host0' ip='172.16.1.200'/>
+    </dhcp>
+  </ip>
+</network>
+EOF
+
+cat > /mnt/extra/external.xml <<EOF
+<network>
+  <name>external</name>
+  <bridge name="virbr101" stp='off' macTableManager="kernel"/>
+  <mtu size="9216"/>
+  <mac address='52:54:00:9a:9b:9c'/>
+  <ip address='172.16.2.1' netmask='255.255.255.0'/>
+</network>
+EOF
+
+virsh net-define /mnt/extra/management.xml && virsh net-autostart management && virsh net-start management && \
+virsh net-define /mnt/extra/external.xml && virsh net-autostart external && virsh net-start external && \
+virsh pool-define-as default dir --target "/mnt/extra/libvirt" && virsh pool-build default && virsh pool-start default && virsh pool-autostart default && \
+virsh pool-list --all && virsh net-list --all && virsh list --all
+
+virt-install --virt-type=kvm --name=host0 --cpu host-passthrough --ram 360448 --vcpus=58 --virt-type=kvm --hvm --cdrom $iso --network network:management,model=vmxnet3 --graphics vnc --video qxl --disk pool=default,size=900,sparse=true,bus=sata,format=qcow2 --boot cdrom,hd,menu=on --mac 08:4F:A9:00:00:01 --noautoconsole --force --os-variant linux2020
+
+cdrom=$(virsh domblklist host0 --details | grep cdrom | awk {'print $3'}) && echo "cdrom device is $cdrom" && virsh attach-disk host0 $iso $cdrom --type cdrom --mode readonly && virsh reset host0
+
+# eject CD before doing reboot
+virsh change-media host0 $iso --eject
+
+virsh attach-interface --domain host0 --type network --source external --model vmxnet3 --mac 02:00:aa:0a:02:21 --config --live && virsh reset host0
+
+#iptables -t nat -L -nv
+#Access ESXi host0 UI 
+# 8001 -> 172.16.1.200:443
+# from local terminal:
+ssh -L 8001:172.16.1.200:443 vpasias@130.127.134.14
+# URL: https://localhost:8001
+
+#Enable SSH on ESXi host
+#https://www.server-world.info/en/note?os=ESXi_7&p=ssh
+
+#Upload ISO Images to ESXi host
+#https://www.server-world.info/en/note?os=ESXi_7&p=vm&f=1
+cd /mnt/extra/virt/images/ && sftp root@172.16.1.200
+cd /vmfs/volumes/datastore1/ISO
+put ubuntu-22.04.4-live-server-amd64.iso
+ls
+exit
+
+##################################################################################################################################################################################
+######################################## MicroK8s Cluster (https://github.com/vpasias/mk8s_cluster) #############################################################################################################
+##################################################################################################################################################################################
+
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n1 'sudo hostnamectl set-hostname n1.example.com --static' && \
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n2 'sudo hostnamectl set-hostname n2.example.com --static' && \
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n3 'sudo hostnamectl set-hostname n3.example.com --static'
+
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n1 "cat << EOF | sudo tee /etc/hosts
+127.0.0.1  localhost  n1.example.com n1
+172.16.1.101  n1.example.com n1
+172.16.1.102  n2.example.com n2
+172.16.1.103  n3.example.com n3
+172.16.1.104  n4.example.com n4
+172.16.1.105  n5.example.com n5
+172.16.1.106  n6.example.com n6
+172.16.1.107  n7.example.com n7
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+EOF"
+
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n2 "cat << EOF | sudo tee /etc/hosts
+127.0.0.1  localhost  n2.example.com n2
+172.16.1.101  n1.example.com n1
+172.16.1.102  n2.example.com n2
+172.16.1.103  n3.example.com n3
+172.16.1.104  n4.example.com n4
+172.16.1.105  n5.example.com n5
+172.16.1.106  n6.example.com n6
+172.16.1.107  n7.example.com n7
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+EOF"
+
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n3 "cat << EOF | sudo tee /etc/hosts
+127.0.0.1  localhost  n3.example.com n3
+172.16.1.101  n1.example.com n1
+172.16.1.102  n2.example.com n2
+172.16.1.103  n3.example.com n3
+172.16.1.104  n4.example.com n4
+172.16.1.105  n5.example.com n5
+172.16.1.106  n6.example.com n6
+172.16.1.107  n7.example.com n7
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+EOF"
+
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n1 'sudo reboot' && \
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n2 'sudo reboot' && \
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n3 'sudo reboot'
+
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n1
+
+cat /sys/module/kvm_intel/parameters/nested && cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l && free -h && df -hT && lsblk
+# cat /etc/resolv.conf
+
+# sudo snap install openstack --channel 2023.2
+sudo snap install openstack --channel 2023.2/edge
+
+sunbeam prepare-node-script | bash -x && newgrp snap_daemon
+
+sunbeam cluster bootstrap --role control --role compute --role storage
+#Use proxy to access external network resources? [y/n] (y): n
+#Management networks shared by hosts (CIDRs, separated by comma) (10.20.20.0/24): 172.16.1.0/24
+#MetalLB address allocation range (supports multiple ranges, comma separated) (10.20.20.10-10.20.20.20): 172.16.1.10-172.16.1.30
+#Disks to attach to MicroCeph: /dev/vdb
+#/dev/sdb
+
+sunbeam cluster add --name n2.example.com
+
+#Token: 
+
+exit
+
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n2
+
+sudo snap install openstack --channel 2023.2/edge
+
+sunbeam prepare-node-script | bash -x && newgrp snap_daemon
+
+sunbeam cluster join --role control --role compute --role storage \
+   --token 
+
+#Free network interface that will be configured for external traffic [eno1/eno2] (eno1): enp9s0
+
+exit
+
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n1
+
+sunbeam cluster add --name n3.example.com
+
+#Token: 
+
+exit
+
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n3
+
+sudo snap install openstack --channel 2023.2/edge
+
+sunbeam prepare-node-script | bash -x && newgrp snap_daemon
+
+sunbeam cluster join --role control --role compute --role storage \
+   --token 
+
+#Free network interface that will be configured for external traffic [eno1/eno2] (eno1): enp8s0
+
+exit
+
+sshpass -p 'kyax7344' ssh -o "StrictHostKeyChecking=no" ubuntu@n1
+
+sunbeam cluster resize
+
+sunbeam configure --openrc demo-openrc
+
+#Local or remote access to VMs [local/remote] (local): remote
+#CIDR of network to use for external networking (10.20.20.0/24): 172.16.2.0/24
+#IP address of default gateway for external network (10.20.20.1): 172.16.2.1
+#Populate OpenStack cloud with demo user, default images, flavors etc [y/n] (y):
+#Username to use for access to OpenStack (demo):
+#Password to use for access to OpenStack (mt********):
+#Network range to use for project network (192.168.122.0/24):
+#Enable ping and SSH access to instances? [y/n] (y):
+#Start of IP allocation range for external network (10.20.20.2): 172.16.2.2
+#End of IP allocation range for external network (10.20.20.254): 172.16.2.254
+#Network type for access to external network [flat/vlan] (flat):
+#Writing openrc to demo-openrc ... done
+#Free network interface that will be configured for external traffic [eno1/eno2] (eno1): enp8s0
+
+sunbeam launch ubuntu --name test
+
+#############################################################################################################
+################ Delete ########################################################################################
+#############################################################################################################
+# virsh console host0
+# virsh shutdown host0
+# virsh start host0
+# virsh list --all
+
+sudo snap remove --purge microk8s && \
+sudo snap remove --purge juju && \
+sudo snap remove --purge openstack && \
+sudo snap remove --purge openstack-hypervisor && \
+sudo /usr/sbin/remove-juju-services && \
+sudo rm -rf /var/lib/juju && \
+rm -rf ~/.local/share/juju && \
+rm -rf ~/snap/openstack && \
+rm -rf ~/snap/openstack-hypervisor && \
+rm -rf ~/snap/microstack/ && \
+rm -rf ~/snap/juju/ && \
+rm -rf ~/snap/microk8s/ && \
+sudo init 6
+
+cd /mnt/extra/ && virsh shutdown host0 && virsh destroy host0 && virsh undefine host0 && \
+virsh net-destroy management && rm -rf /mnt/extra/management.xml && virsh net-undefine management && \
+virsh net-destroy external && rm -rf /mnt/extra/external.xml && virsh net-undefine external && \
+rm -rf /root/.ssh/known_hosts && touch /root/.ssh/known_hosts && sudo virsh list --all && sudo brctl show && sudo virsh net-list --all
